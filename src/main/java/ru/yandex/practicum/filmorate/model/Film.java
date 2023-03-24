@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class Film {
 
     @PositiveOrZero
-    private int id;
+    private Integer id;
     @NotBlank(message = "Не указано название фильма.")
     private String name;
     @NotNull(message = "Не указано описание фильма.")

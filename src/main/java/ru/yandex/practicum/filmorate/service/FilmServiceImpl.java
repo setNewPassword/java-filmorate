@@ -15,7 +15,7 @@ import java.util.Optional;
 
 public class FilmServiceImpl implements FilmService{
 
-    private static int idCounter;
+    private static Integer idCounter = 0;
     @Autowired
     private FilmRepository repository;
     @Override
@@ -32,13 +32,13 @@ public class FilmServiceImpl implements FilmService{
 
     @Override
     public Film update(Film film) {
-        Optional<Film> existingFilm = repository.findById(film.getId());
-        if (existingFilm.isPresent()) {
-            film = repository.save(film);
-            log.info("Данные фильма изменены: {}", film);
+        Film updatedFilm;
+        if (repository.findById(film.getId()).isPresent()) {
+            updatedFilm = repository.save(film);
+            log.info("Данные фильма изменены: {}", updatedFilm);
         } else {
             throw new FilmNotFoundException("Фильм с id " + film.getId() + " не найден.");
         }
-        return film;
+        return updatedFilm;
     }
 }

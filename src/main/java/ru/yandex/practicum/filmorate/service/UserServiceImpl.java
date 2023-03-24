@@ -14,7 +14,7 @@ import java.util.Optional;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private static int idCounter;
+    private static Integer idCounter = 0;
     @Autowired
     private UserRepository repository;
 
@@ -32,13 +32,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        Optional<User> existingUser = repository.findById(user.getId());
-        if (existingUser.isPresent()) {
-            repository.save(user);
+        User updatedUser;
+        if (repository.findById(user.getId()).isPresent()) {
+            updatedUser = repository.save(user);
             log.info("Данные пользователя изменены: {}", user);
         } else {
             throw new UserNotFoundException("Пользователь с id " + user.getId() + " не найден.");
         }
-        return user;
+        return updatedUser;
     }
 }

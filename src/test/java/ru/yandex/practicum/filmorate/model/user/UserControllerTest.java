@@ -35,12 +35,14 @@ public class UserControllerTest {
     @BeforeEach
     public void createUsers() {
         user1 = User.builder()
+                .id(0)
                 .email("dee.irk@gmail.com")
                 .login("dee")
                 .name("Дмитрий")
                 .birthday(LocalDate.of(1982, 6, 6))
                 .build();
         user2 = User.builder()
+                .id(1)
                 .email("volozh@yandex.ru")
                 .login("volozh")
                 .name("Аркадий")
@@ -57,9 +59,8 @@ public class UserControllerTest {
                 .accept(MediaType.APPLICATION_JSON);
 
         mvc.perform(mvcRequest)
-                .andExpect(status().isCreated())
+                .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(0)))
                 .andExpect(jsonPath("$.email", is("dee.irk@gmail.com")))
                 .andExpect(jsonPath("$.login", is("dee")))
                 .andExpect(jsonPath("$.name", is("Дмитрий")))

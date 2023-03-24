@@ -18,8 +18,8 @@ public class FilmRepositoryImpl implements FilmRepository {
     }
 
     @Override
-    public Optional<Film> findById(int id) {
-        return films.containsKey(id) ? Optional.of(films.get(id)) : Optional.empty();
+    public Optional<Film> findById(Integer id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     @Override

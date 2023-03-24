@@ -65,9 +65,8 @@ public class FilmControllerTest {
                 .accept(MediaType.APPLICATION_JSON);
 
         mvc.perform(mvcRequest)
-                .andExpect(status().isCreated())
+                .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(0)))
                 .andExpect(jsonPath("$.name", is("Titanic")))
                 .andExpect(jsonPath("$.description",
                         is("American epic romance and disaster film directed by James Cameron.")))

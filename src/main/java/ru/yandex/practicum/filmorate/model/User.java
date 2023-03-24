@@ -8,17 +8,19 @@ import lombok.extern.slf4j.Slf4j;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
+import ru.yandex.practicum.filmorate.validate.NameValidator;
+
 @Data
 @Slf4j
 @Builder(toBuilder = true)
 public class User {
 
     @PositiveOrZero
-    private int id;
+    private Integer id;
     @NotBlank(message = "Не указан адрес электронной почты.")
     @Email(message = "Некорректный адрес электронной почты.")
     private String email;
-    @NotNull(message = "Не указан логин")
+    @NotBlank(message = "Не указан логин")
     @Pattern(regexp = "\\S+", message = "Логин содержит пробелы")
     private String login;
     private String name;
@@ -26,16 +28,8 @@ public class User {
     @PastOrPresent(message = "Некорректная дата рождения")
     private LocalDate birthday;
 
-    private String checkName(String name, String login) {
-        if (name == null || name.isBlank() ) {
-            log.info("В качестве имени использован логин.");
-            return login;
-        }
-        return name;
-    }
-
     @JsonCreator
-    public User (@JsonProperty("id") int id,
+    public User (@JsonProperty("id") Integer id,
                  @JsonProperty("email") String email,
                  @JsonProperty("login") String login,
                  @JsonProperty("name") String name,
@@ -43,7 +37,7 @@ public class User {
         this.id = id;
         this.email = email;
         this.login = login;
-        this.name = checkName(name, login);
+        this.name = NameValidator.validateName(name, login);
         this.birthday = birthday;
     }
 }
