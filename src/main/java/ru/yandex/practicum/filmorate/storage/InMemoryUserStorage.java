@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.repository;
+package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
@@ -6,11 +6,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.*;
 
 @Repository
-public class UserRepositoryImpl implements UserRepository {
+public class InMemoryUserStorage implements UserStorage {
 
-    private final Map<Integer, User> users;
+    private final Map<Long, User> users;
 
-    public UserRepositoryImpl() {
+    public InMemoryUserStorage() {
         users = new HashMap<>();
     }
 
@@ -20,7 +20,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById(Integer id) {
+    public Optional<User> findById(Long id) {
         return Optional.ofNullable(users.get(id));
     }
 

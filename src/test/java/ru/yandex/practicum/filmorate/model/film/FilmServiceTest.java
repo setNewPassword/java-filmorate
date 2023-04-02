@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.model.film;
 
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.repository.FilmRepository;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.service.FilmServiceImpl;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.BDDMockito.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,7 +23,7 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 public class FilmServiceTest {
     @Mock
-    FilmRepository repository;
+    FilmStorage repository;
     @InjectMocks
     FilmServiceImpl service;
     Film film1;
@@ -59,11 +59,11 @@ public class FilmServiceTest {
     @Test
     void shouldUpdateFilmAndReturnIt() {
         given(repository.save(film1)).willReturn(film1);
-        given(repository.findById(anyInt())).willReturn(Optional.of(film1));
+        given(repository.findById(anyLong())).willReturn(Optional.of(film1));
         given(repository.save(film2)).willReturn(film2);
 
         Film film = service.create(film1);
-        int id = film.getId();
+        long id = film.getId();
         film2.setId(id);
         Film updatedFilm = service.update(film2);
 

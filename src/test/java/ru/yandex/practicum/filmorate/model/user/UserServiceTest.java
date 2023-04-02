@@ -12,7 +12,7 @@ import static org.mockito.Mockito.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.repository.UserRepository;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.service.UserServiceImpl;
 
 import java.time.LocalDate;
@@ -24,7 +24,7 @@ import java.util.Optional;
 public class UserServiceTest {
 
     @Mock
-    UserRepository repository;
+    UserStorage repository;
     @InjectMocks
     UserServiceImpl service;
     User user1;
@@ -60,11 +60,11 @@ public class UserServiceTest {
     @Test
     void shouldUpdateUserAndReturnIt() {
         given(repository.save(user1)).willReturn(user1);
-        given(repository.findById(anyInt())).willReturn(Optional.of(user1));
+        given(repository.findById(anyLong())).willReturn(Optional.of(user1));
         given(repository.save(user2)).willReturn(user2);
 
         User savedUser = service.create(user1);
-        int id = savedUser.getId();
+        Long id = savedUser.getId();
         user2.setId(id);
         User updatedUser = service.update(user2);
 

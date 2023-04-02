@@ -5,13 +5,15 @@ import ru.yandex.practicum.filmorate.validate.FirstCinema;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
 public class Film {
 
     @PositiveOrZero
-    private Integer id;
+    private Long id;
     @NotBlank(message = "Не указано название фильма.")
     private String name;
     @NotNull(message = "Не указано описание фильма.")
@@ -23,4 +25,5 @@ public class Film {
     @Min(value = 1, message = "Продолжительность фильма указана не верно.")
     @Positive
     private long duration;
+    private Set<Long> likes = new HashSet<>();
 }

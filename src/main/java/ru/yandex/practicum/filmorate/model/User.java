@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import ru.yandex.practicum.filmorate.validate.NameValidator;
 
@@ -16,7 +18,7 @@ import ru.yandex.practicum.filmorate.validate.NameValidator;
 public class User {
 
     @PositiveOrZero
-    private Integer id;
+    private Long id;
     @NotBlank(message = "Не указан адрес электронной почты.")
     @Email(message = "Некорректный адрес электронной почты.")
     private String email;
@@ -28,8 +30,10 @@ public class User {
     @PastOrPresent(message = "Некорректная дата рождения")
     private LocalDate birthday;
 
+    private Set<Long> friends = new HashSet<>();
+
     @JsonCreator
-    public User (@JsonProperty("id") Integer id,
+    public User (@JsonProperty("id") Long id,
                  @JsonProperty("email") String email,
                  @JsonProperty("login") String login,
                  @JsonProperty("name") String name,
