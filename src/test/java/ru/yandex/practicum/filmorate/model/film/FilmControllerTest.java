@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.Matchers.*;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 
 @WebMvcTest(FilmController.class)
 
@@ -39,6 +40,7 @@ public class FilmControllerTest {
     FilmService service;
     Film film1;
     Film film2;
+    static Random random = new Random();
 
     @BeforeEach
     public void createFilms() {
@@ -58,46 +60,46 @@ public class FilmControllerTest {
 
     @Test
     void shouldAddFilmAndReturnIt() throws Exception {
-        when(service.create(any(Film.class))).thenReturn(film1);
+        when(service.create(film1)).thenReturn(film1);
 
-        var mvcRequest = post("/films").contentType(MediaType.APPLICATION_JSON)
+        var mvcRequest = post("/films")
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(film1))
                 .accept(MediaType.APPLICATION_JSON);
 
         mvc.perform(mvcRequest)
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.name", is("Titanic")))
-                .andExpect(jsonPath("$.description",
-                        is("American epic romance and disaster film directed by James Cameron.")))
-                .andExpect(jsonPath("$.releaseDate", is("1997-12-19")))
-                .andExpect(jsonPath("$.duration", is(195)));
+                .andExpect(jsonPath("$.name", is(film1.getName())))
+                .andExpect(jsonPath("$.description", is(film1.getDescription())))
+                .andExpect(jsonPath("$.releaseDate", is(film1.getReleaseDate().toString())))
+                .andExpect(jsonPath("$.duration", is(film1.getDuration())));
     }
 
     @Test
     void shouldUpdateFilmAndReturnIt() throws Exception {
-        film2.setId(1);
-        when(service.update(any(Film.class))).thenReturn(film2);
+        film2.setId(1L);
+        when(service.update(film2)).thenReturn(film2);
 
-        var mvcRequest = put("/films").contentType(MediaType.APPLICATION_JSON)
+        var mvcRequest = put("/films")
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(film2))
                 .accept(MediaType.APPLICATION_JSON);
 
         mvc.perform(mvcRequest)
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.name", is("The Shawshank Redemption")))
-                .andExpect(jsonPath("$.description",
-                        is("American drama film directed by Frank Darabont, based on the 1982 Stephen King novella.")))
-                .andExpect(jsonPath("$.releaseDate", is("1994-09-23")))
-                .andExpect(jsonPath("$.duration", is(142)));
+                .andExpect(jsonPath("$.id", is((int) film2.getId())))
+                .andExpect(jsonPath("$.name", is(film2.getName())))
+                .andExpect(jsonPath("$.description", is(film2.getDescription())))
+                .andExpect(jsonPath("$.releaseDate", is(film2.getReleaseDate().toString())))
+                .andExpect(jsonPath("$.duration", is(film2.getDuration())));
     }
 
     @Test
     void shouldReturnAllFilms() throws Exception {
-        film1.setId(1);
-        film2.setId(2);
+        film1.setId(1L);
+        film2.setId(2L);
         when(service.getAllFilms()).thenReturn(List.of(film1, film2));
 
         var mvcRequest = get("/films").accept(MediaType.APPLICATION_JSON);
@@ -107,13 +109,85 @@ public class FilmControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(mapper.writeValueAsString(List.of(film1, film2))))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[*].id", contains(1, 2)))
-                .andExpect(jsonPath("$[*].name", contains("Titanic", "The Shawshank Redemption")))
+                .andExpect(jsonPath("$[*].id", contains((int) film1.getId(), (int) film2.getId())))
+                .andExpect(jsonPath("$[*].name", contains(film1.getName(), film2.getName())))
                 .andExpect(jsonPath("$[*].description",
-                        contains("American epic romance and disaster film directed by James Cameron.",
-                                "American drama film directed by Frank Darabont, based on the 1982 Stephen King novella.")))
-                .andExpect(jsonPath("$[*].releaseDate", contains("1997-12-19", "1994-09-23")))
-                .andExpect(jsonPath("$[*].duration", contains(195, 142)));
+                        contains(film1.getDescription(), film2.getDescription())))
+                .andExpect(jsonPath("$[*].releaseDate",
+                        contains(film1.getReleaseDate().toString(), film2.getReleaseDate().toString())))
+                .andExpect(jsonPath("$[*].duration", contains(film1.getDuration(), film2.getDuration())));
     }
 
+    @Test
+    public void shouldReturnFilmById() throws Exception {
+        when(service.getFilmById(film1.getId())).thenReturn(film1);
+
+        var mvcRequest = get("/films/" + film1.getId());
+
+        mvc.perform(mvcRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(mapper.writeValueAsString(film1)))
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.id", is((int) film1.getId())))
+                .andExpect(jsonPath("$.name", is(film1.getName())))
+                .andExpect(jsonPath("$.description", is(film1.getDescription())))
+                .andExpect(jsonPath("$.releaseDate", is(film1.getReleaseDate().toString())))
+                .andExpect(jsonPath("$.duration", is(film1.getDuration())));
+    }
+
+    @Test
+    void shouldAddLikeAndReturnFilm() throws Exception {
+        when(service.addLike(anyLong(), anyLong())).thenReturn(film1);
+
+        var mvcRequest = put(String.format("/films/%d/like/%d", film1.getId(), random.nextLong()));
+
+        mvc.perform(mvcRequest).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(mapper.writeValueAsString(film1)))
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.id", is((int) film1.getId())))
+                .andExpect(jsonPath("$.name", is(film1.getName())))
+                .andExpect(jsonPath("$.description", is(film1.getDescription())))
+                .andExpect(jsonPath("$.releaseDate", is(film1.getReleaseDate().toString())))
+                .andExpect(jsonPath("$.duration", is(film1.getDuration())));
+    }
+
+    @Test
+    void shouldRemoveLikeAndReturnFilm() throws Exception {
+        when(service.removeLike(anyLong(), anyLong())).thenReturn(film1);
+
+        var mvcRequest = delete(String.format("/films/%d/like/%d", film1.getId(), random.nextLong()));
+
+        mvc.perform(mvcRequest).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(mapper.writeValueAsString(film1)))
+                .andExpect(jsonPath("$", notNullValue()))
+                .andExpect(jsonPath("$.id", is((int) film1.getId())))
+                .andExpect(jsonPath("$.name", is(film1.getName())))
+                .andExpect(jsonPath("$.description", is(film1.getDescription())))
+                .andExpect(jsonPath("$.releaseDate", is(film1.getReleaseDate().toString())))
+                .andExpect(jsonPath("$.duration", is(film1.getDuration())));
+    }
+
+    @Test
+    void shouldGetTopLikedFilms() throws Exception {
+        when(service.getTopLikedFilms(anyInt())).thenReturn(List.of(film1, film2));
+
+        var mvcRequest = get("/films/popular");
+
+        mvc.perform(mvcRequest)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(mapper.writeValueAsString(List.of(film1, film2))))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[*].id", contains((int) film1.getId(), (int) film2.getId())))
+                .andExpect(jsonPath("$[*].name", contains(film1.getName(), film2.getName())))
+                .andExpect(jsonPath("$[*].description",
+                        contains(film1.getDescription(), film2.getDescription())))
+                .andExpect(jsonPath("$[*].releaseDate",
+                        contains(film1.getReleaseDate().toString(), film2.getReleaseDate().toString())))
+                .andExpect(jsonPath("$[*].duration",
+                        contains(film1.getDuration(), film2.getDuration())));
+    }
 }

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.IncorrectRequestException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -20,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
+        log.info("Запрошен список всех пользователей.");
         return repository.getAllUsers();
     }
 
@@ -28,6 +30,12 @@ public class UserServiceImpl implements UserService {
         user.setId(++idCounter);
         log.info("Добавлен новый пользователь: {}", user);
         return repository.save(user);
+    }
+
+    @Override
+    public User getUserById(Long userId) {
+        log.info("Запрошен пользователь с id: {}", userId);
+        return getUserFromRepositoryOrThrowException(userId);
     }
 
     @Override
@@ -44,40 +52,25 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User addFriend(Long basicUserId, Long addingUserId) {
-        User basicUser;
-        if (repository.findById(basicUserId).isPresent()) {
-            basicUser = repository.findById(basicUserId).get();
+        User basicUser = getUserFromRepositoryOrThrowException(basicUserId);
+        User addingUser = getUserFromRepositoryOrThrowException(addingUserId);
+        if (basicUser.getFriends().contains(addingUserId)) {
+            throw new IncorrectRequestException(String
+                    .format("Пользователи id: %d и id: %d уже являются друзьями.", basicUserId, addingUserId));
         } else {
-            throw new UserNotFoundException("Пользователь с id " + basicUserId + " не найден.");
+            basicUser.getFriends().add(addingUserId);
+            basicUser = repository.save(basicUser);
+            addingUser.getFriends().add(basicUserId);
+            repository.save(addingUser);
+            log.info("Пользователь с id {} добавил в друзья пользователя с id {}.", basicUserId, addingUserId);
+            return basicUser;
         }
-        User addingUser;
-        if (repository.findById(addingUserId).isPresent()) {
-            addingUser = repository.findById(addingUserId).get();
-        } else {
-            throw new UserNotFoundException("Пользователь с id " + addingUserId + " не найден.");
-        }
-        basicUser.getFriends().add(addingUserId);
-        basicUser = repository.save(basicUser);
-        addingUser.getFriends().add(addingUserId);
-        repository.save(addingUser);
-        log.info("Пользователь с id {} добавил в друзья пользователя с id {}.", basicUserId, addingUserId);
-        return basicUser;
     }
 
     @Override
     public User removeFriend(Long basicUserId, Long removingUserId) {
-        User basicUser;
-        if (repository.findById(basicUserId).isPresent()) {
-            basicUser = repository.findById(basicUserId).get();
-        } else {
-            throw new UserNotFoundException("Пользователь с id " + basicUserId + " не найден.");
-        }
-        User removingUser;
-        if (repository.findById(removingUserId).isPresent()) {
-            removingUser = repository.findById(removingUserId).get();
-        } else {
-            throw new UserNotFoundException("Пользователь с id " + removingUserId + " не найден.");
-        }
+        User basicUser = getUserFromRepositoryOrThrowException(basicUserId);
+        User removingUser = getUserFromRepositoryOrThrowException(removingUserId);
         if (basicUser.getFriends().contains(removingUserId) &&
                 removingUser.getFriends().contains(basicUserId)) {
             basicUser.getFriends().remove(removingUserId);
@@ -85,8 +78,8 @@ public class UserServiceImpl implements UserService {
             removingUser.getFriends().remove(basicUserId);
             repository.save(removingUser);
         } else {
-            throw new UserNotFoundException("Попытка расторгнуть несуществующую дружбу, id: "
-                    + basicUserId + " и id: " + removingUserId + ".");
+            throw new IncorrectRequestException(String
+                    .format("Пользователи id: %d и id: %d не являются друзьями.", basicUserId, removingUserId));
         }
         log.info("Пользователь с id {} удалил из друзей пользователя с id {}.", basicUserId, removingUserId);
         return basicUser;
@@ -94,50 +87,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getCommonFriends(Long basicUserId, Long secondUserId) {
-        User basicUser;
-        if (repository.findById(basicUserId).isPresent()) {
-            basicUser = repository.findById(basicUserId).get();
-        } else {
-            throw new UserNotFoundException("Пользователь с id " + basicUserId + " не найден.");
-        }
-        User secondUser;
-        if (repository.findById(secondUserId).isPresent()) {
-            secondUser = repository.findById(secondUserId).get();
-        } else {
-            throw new UserNotFoundException("Пользователь с id " + secondUserId + " не найден.");
-        }
-
+        User basicUser = getUserFromRepositoryOrThrowException(basicUserId);
+        User secondUser = getUserFromRepositoryOrThrowException(secondUserId);
+        log.info("Запрошен список общих друзей пользователя с id {} и пользователя с id {}.", basicUserId, secondUserId);
         return basicUser
                 .getFriends()
                 .stream()
                 .filter(secondUser.getFriends()::contains)
-                .map(id -> repository
-                        .findById(id)
-                        .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден.")))
+                .map(this::getUserFromRepositoryOrThrowException)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public User getUserById(Long userId) {
-        return repository
-                .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден."));
     }
 
     @Override
     public List<User> getUsersFriends(Long userId) {
-        User user;
-        if (repository.findById(userId).isPresent()) {
-            user = repository.findById(userId).get();
-        } else {
-            throw new UserNotFoundException("Пользователь с id " + userId + " не найден.");
-        }
+        User user = getUserFromRepositoryOrThrowException(userId);
+        log.info("Запрошен список друзей пользователя с id: {}", userId);
         return user
                 .getFriends()
                 .stream()
-                .map(id -> repository
-                        .findById(id)
-                        .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден.")))
+                .map(this::getUserFromRepositoryOrThrowException)
                 .collect(Collectors.toList());
+    }
+
+    private User getUserFromRepositoryOrThrowException(Long id) {
+        return repository
+                .findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден."));
     }
 }

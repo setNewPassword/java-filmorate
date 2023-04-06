@@ -13,7 +13,7 @@ import java.util.Set;
 public class Film {
 
     @PositiveOrZero
-    private Long id;
+    private long id;
     @NotBlank(message = "Не указано название фильма.")
     private String name;
     @NotNull(message = "Не указано описание фильма.")
@@ -24,6 +24,6 @@ public class Film {
     private LocalDate releaseDate;
     @Min(value = 1, message = "Продолжительность фильма указана не верно.")
     @Positive
-    private long duration;
-    private Set<Long> likes = new HashSet<>();
+    private int duration;
+    private final Set<Long> likes = new HashSet<>();
 }
