@@ -33,7 +33,7 @@ public class User {
     private Set<Long> friends;
 
     @JsonCreator
-    public User (@JsonProperty("id") Long id,
+    public User(@JsonProperty("id") Long id,
                  @JsonProperty("email") String email,
                  @JsonProperty("login") String login,
                  @JsonProperty("name") String name,
