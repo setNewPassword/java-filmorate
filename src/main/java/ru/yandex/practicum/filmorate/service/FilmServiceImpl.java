@@ -15,13 +15,14 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 
-public class FilmServiceImpl implements FilmService{
+public class FilmServiceImpl implements FilmService {
 
     private static Long idCounter = 0L;
     @Autowired
     private FilmStorage filmRepository;
     @Autowired
     private UserStorage userRepository;
+
     @Override
     public List<Film> getAllFilms() {
         log.info("Запрошен полный список фильмов.");
