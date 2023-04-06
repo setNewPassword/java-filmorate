@@ -53,7 +53,7 @@ public class ControllerErrorHandler {
         String message = String.format("Параметр '%s' со значением '%s' не может быть приведен к типу '%s'",
                 e.getName(), e.getValue(), e.getRequiredType());
         log.warn("400 {}", e.getMessage());
-        return new AppError(400, message +": " + e.getMessage());
+        return new AppError(400, message + ": " + e.getMessage());
     }
 
     @ExceptionHandler
