@@ -17,11 +17,10 @@ import java.util.stream.Collectors;
 
 public class FilmServiceImpl implements FilmService {
 
-    private static Long idCounter = 0L;
     @Autowired
     private FilmStorage filmRepository;
     @Autowired
-    private UserStorage userRepository;
+    private UserService userService;
 
     @Override
     public List<Film> getAllFilms() {
@@ -31,20 +30,16 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(Film film) {
-        film.setId(++idCounter);
         log.info("Добавлен новый фильм: {}", film);
-        return filmRepository.save(film);
+        return filmRepository.create(film);
     }
 
     @Override
     public Film update(Film film) {
         Film updatedFilm;
-        if (filmRepository.findById(film.getId()).isPresent()) {
-            updatedFilm = filmRepository.save(film);
-            log.info("Данные фильма изменены: {}", updatedFilm);
-        } else {
-            throw new FilmNotFoundException("Фильм с id " + film.getId() + " не найден.");
-        }
+        getFilmFromRepositoryOrThrowException(film.getId());
+        updatedFilm = filmRepository.save(film);
+        log.info("Данные фильма изменены: {}", updatedFilm);
         return updatedFilm;
     }
 
@@ -57,9 +52,8 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film addLike(Long filmId, Long userId) {
         Film likedFilm = getFilmFromRepositoryOrThrowException(filmId);
-        likedFilm.getLikes().add(userRepository
-                .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден."))
+        likedFilm.getLikes().add(userService
+                .getUserById(userId)
                 .getId());
         likedFilm = filmRepository.save(likedFilm);
         log.info("Пользователь с id {} поставил лайк фильму с id {}.", userId, filmId);
@@ -69,9 +63,8 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film removeLike(Long filmId, Long userId) {
         Film likedFilm = getFilmFromRepositoryOrThrowException(filmId);
-        likedFilm.getLikes().remove(userRepository
-                .findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + userId + " не найден."))
+        likedFilm.getLikes().remove(userService
+                .getUserById(userId)
                 .getId());
         likedFilm = filmRepository.save(likedFilm);
         log.info("Пользователь с id {} удалил лайк фильму с id {}.", userId, filmId);

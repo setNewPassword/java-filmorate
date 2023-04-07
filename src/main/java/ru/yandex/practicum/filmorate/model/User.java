@@ -34,11 +34,11 @@ public class User {
 
     @JsonCreator
     public User(@JsonProperty("id") Long id,
-                 @JsonProperty("email") String email,
-                 @JsonProperty("login") String login,
-                 @JsonProperty("name") String name,
-                 @JsonProperty("birthday") LocalDate birthday,
-                 @JsonProperty("friends") Set<Long> friends) {
+                @JsonProperty("email") String email,
+                @JsonProperty("login") String login,
+                @JsonProperty("name") String name,
+                @JsonProperty("birthday") LocalDate birthday,
+                @JsonProperty("friends") Set<Long> friends) {
         this.id = (id == null) ? 0 : id;
         this.email = email;
         this.login = login;

@@ -7,12 +7,9 @@ import java.util.*;
 
 @Repository
 public class InMemoryUserStorage implements UserStorage {
+    private static Long idCounter = 0L;
 
-    private final Map<Long, User> users;
-
-    public InMemoryUserStorage() {
-        users = new HashMap<>();
-    }
+    private final Map<Long, User> users = new HashMap<>();
 
     @Override
     public List<User> getAllUsers() {
@@ -22,6 +19,13 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Optional<User> findById(Long id) {
         return Optional.ofNullable(users.get(id));
+    }
+
+    @Override
+    public User create(User user) {
+        user.setId(++idCounter);
+        users.put(user.getId(), user);
+        return user;
     }
 
     @Override

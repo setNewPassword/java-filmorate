@@ -7,11 +7,9 @@ import java.util.*;
 
 @Repository
 public class InMemoryFilmStorage implements FilmStorage {
-    private final Map<Long, Film> films;
+    private static Long idCounter = 0L;
 
-    public InMemoryFilmStorage() {
-        films = new HashMap<>();
-    }
+    private final Map<Long, Film> films = new HashMap<>();
 
     @Override
     public List<Film> getAllFilms() {
@@ -21,6 +19,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Optional<Film> findById(Long id) {
         return Optional.ofNullable(films.get(id));
+    }
+
+    @Override
+    public Film create(Film film) {
+        film.setId(++idCounter);
+        films.put(film.getId(), film);
+        return film;
     }
 
     @Override

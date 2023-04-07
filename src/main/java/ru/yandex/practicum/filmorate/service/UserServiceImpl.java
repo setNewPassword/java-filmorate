@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private static Long idCounter = 0L;
     @Autowired
     private UserStorage repository;
 
@@ -27,9 +26,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        user.setId(++idCounter);
         log.info("Добавлен новый пользователь: {}", user);
-        return repository.save(user);
+        return repository.create(user);
     }
 
     @Override
@@ -41,12 +39,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         User updatedUser;
-        if (repository.findById(user.getId()).isPresent()) {
-            updatedUser = repository.save(user);
-            log.info("Данные пользователя изменены: {}", user);
-        } else {
-            throw new UserNotFoundException("Пользователь с id " + user.getId() + " не найден.");
-        }
+        getUserFromRepositoryOrThrowException(user.getId());
+        updatedUser = repository.save(user);
+        log.info("Данные пользователя изменены: {}", user);
         return updatedUser;
     }
 

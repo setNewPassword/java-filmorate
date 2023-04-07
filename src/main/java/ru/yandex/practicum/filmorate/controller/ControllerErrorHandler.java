@@ -22,7 +22,7 @@ public class ControllerErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public AppError handleValidationException(final ValidationException e) {
         log.warn("400 {}", e.getMessage());
-        return  new AppError(400, e.getMessage());
+        return new AppError(400, e.getMessage());
     }
 
     @ExceptionHandler({FilmNotFoundException.class, UserNotFoundException.class})
@@ -42,7 +42,7 @@ public class ControllerErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected AppError handleHttpMessageNotReadableException(HttpMessageNotReadableException e,
-                                                    HttpHeaders headers, HttpStatus status, WebRequest request) {
+                                                             HttpHeaders headers, HttpStatus status, WebRequest request) {
         log.warn("400 {}", e.getMessage());
         return new AppError(400, e.getMessage());
     }
