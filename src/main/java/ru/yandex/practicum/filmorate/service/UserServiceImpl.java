@@ -26,8 +26,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        log.info("Добавлен новый пользователь: {}", user);
-        return repository.create(user);
+        User createdUser = repository.create(user);
+        log.info("Добавлен новый пользователь: {}", createdUser);
+        return createdUser;
     }
 
     @Override

@@ -28,8 +28,9 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film create(Film film) {
-        log.info("Добавлен новый фильм: {}", film);
-        return filmRepository.create(film);
+        Film crearedFilm = filmRepository.create(film);
+        log.info("Добавлен новый фильм: {}", crearedFilm);
+        return crearedFilm;
     }
 
     @Override
