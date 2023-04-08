@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
@@ -24,6 +22,11 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
+    }
+
     @PostMapping
     public User addNew(@RequestBody @Valid User user) {
         return userService.create(user);
@@ -32,5 +35,25 @@ public class UserController {
     @PutMapping
     public User updateExisting(@RequestBody @Valid User user) {
         return userService.update(user);
+    }
+
+    @PutMapping("/{basicUserId}/friends/{addingUserId}")
+    public User addFriend(@PathVariable Long basicUserId, @PathVariable Long addingUserId) {
+        return userService.addFriend(basicUserId, addingUserId);
+    }
+
+    @DeleteMapping("/{basicUserId}/friends/{addingUserId}")
+    public User removeFriend(@PathVariable Long basicUserId, @PathVariable Long addingUserId) {
+        return userService.removeFriend(basicUserId, addingUserId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable Long id) {
+        return userService.getUsersFriends(id);
+    }
+
+    @GetMapping("/{basicUserId}/friends/common/{secondUserId}")
+    public List<User> getCommonFriends(@PathVariable Long basicUserId, @PathVariable Long secondUserId) {
+        return userService.getCommonFriends(basicUserId, secondUserId);
     }
 }

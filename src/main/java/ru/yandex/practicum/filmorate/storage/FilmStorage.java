@@ -1,12 +1,16 @@
-package ru.yandex.practicum.filmorate.repository;
+package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface FilmRepository {
+public interface FilmStorage {
     List<Film> getAllFilms();
-    Optional<Film> findById(Integer id);
+
+    Optional<Film> findById(Long id);
+
+    Film create(Film film);
+
     Film save(Film film);
 }
