@@ -5,7 +5,9 @@ import ru.yandex.practicum.filmorate.validate.FirstCinema;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -26,4 +28,6 @@ public class Film {
     @Positive
     private int duration;
     private final Set<Long> likes = new HashSet<>();
+    private List<Genre> genres = new ArrayList<>();
+    private Mpa mpa;
 }
