@@ -12,7 +12,7 @@ import java.util.Set;
 
 @Data
 @Builder(toBuilder = true)
-public class Film {
+public class Film implements Comparable<Film> {
 
     @PositiveOrZero
     private long id;
@@ -28,6 +28,12 @@ public class Film {
     @Positive
     private int duration;
     private final Set<Long> likes = new HashSet<>();
-    private List<Genre> genres = new ArrayList<>();
+    private final Set<Genre> genres = new HashSet<>();
+    @NotNull(message = "Не указан возрастной рейтинг фильма.")
     private Mpa mpa;
+
+    @Override
+    public int compareTo(Film o) {
+        return Long.compare(this.id, o.id);
+    }
 }

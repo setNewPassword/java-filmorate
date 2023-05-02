@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import ru.yandex.practicum.filmorate.validate.NameValidator;
@@ -30,20 +32,19 @@ public class User {
     @PastOrPresent(message = "Некорректная дата рождения")
     private LocalDate birthday;
 
-    private Set<Long> friends;
-
+    private final Map<Long, Boolean> friends;
     @JsonCreator
     public User(@JsonProperty("id") Long id,
                 @JsonProperty("email") String email,
                 @JsonProperty("login") String login,
                 @JsonProperty("name") String name,
                 @JsonProperty("birthday") LocalDate birthday,
-                @JsonProperty("friends") Set<Long> friends) {
+                @JsonProperty("friends") Map<Long, Boolean> friends) {
         this.id = (id == null) ? 0 : id;
         this.email = email;
         this.login = login;
         this.name = NameValidator.validateName(name, login);
         this.birthday = birthday;
-        this.friends = (friends == null) ? new HashSet<>() : friends;
+        this.friends = (friends == null) ? new HashMap<>() : friends;
     }
 }

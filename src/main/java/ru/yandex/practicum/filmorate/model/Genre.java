@@ -1,11 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.serializer.GenreDeserializer;
 
-@AllArgsConstructor
+@JsonDeserialize(using = GenreDeserializer.class)
 @Data
 public class Genre {
-    Integer id;
-    GenreType genreType;
+
+    private int id;
+    private String name;
+
+    public Genre(int id) {
+        this.id = id;
+        this.name = GenreType.values()[id - 1].getName();
+    }
 }
