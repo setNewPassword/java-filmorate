@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.dao.GenreStorage;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.model.FilmorateRowMapper.GENRE_ROW_MAPPER;
@@ -29,7 +29,7 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     @Override
-    public Collection<Genre> getAll() {
+    public List<Genre> getAll() {
         var sqlQuery = "SELECT * FROM genre ORDER BY genre_id";
         return jdbcTemplate.query(sqlQuery, GENRE_ROW_MAPPER);
     }

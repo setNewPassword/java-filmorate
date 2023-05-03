@@ -35,6 +35,5 @@ public class FilmorateRowMapper {
 
     public static final RowMapper<Friendship> FRIENDSHIP_ROW_MAPPER = ((ResultSet resultSet, int rowNum) ->
             new Friendship(resultSet.getLong("user_id"),
-                    resultSet.getLong("friend_id"),
-                    resultSet.getBoolean("status")));
+                    resultSet.getLong("friend_id")));
 }

@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FriendshipStorage;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,26 +95,26 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getCommonFriends(long basicUserId, long secondUserId) {
-        User basicUser = getUserFromRepositoryOrThrowException(basicUserId);
-        User secondUser = getUserFromRepositoryOrThrowException(secondUserId);
-        log.info("Запрошен список общих друзей пользователя с id {} и пользователя с id {}.", basicUserId, secondUserId);
-        return basicUser
-                .getFriends()
-                .stream()
-                .filter(secondUser.getFriends()::contains)
-                .map(this::getUserFromRepositoryOrThrowException)
-                .collect(Collectors.toList());
+        List<Long> commonFriendsId = null;
+        log.info("Запрошен список общих друзей пользователя с id = {} и пользователя с id = {}.", basicUserId, secondUserId);
+        if (existsById(basicUserId) && existsById(secondUserId)) {
+            Collection<Long> basicUserFriendsId = friendshipStorage.findFriendsIdByUserId(basicUserId);
+            commonFriendsId = friendshipStorage.findFriendsIdByUserId(secondUserId)
+                    .stream()
+                    .filter(basicUserFriendsId::contains)
+                    .collect(Collectors.toList());
+        }
+        return userStorage.getAllById(commonFriendsId);
     }
 
     @Override
     public List<User> getUsersFriends(long userId) {
-        User user = getUserFromRepositoryOrThrowException(userId);
-        log.info("Запрошен список друзей пользователя с id: {}", userId);
-        return user
-                .getFriends()
-                .stream()
-                .map(this::getUserFromRepositoryOrThrowException)
-                .collect(Collectors.toList());
+        List<User> result = null;
+        log.info("Запрошен список друзей пользователя с id = {}.", userId);
+        if (existsById(userId)) {
+            result = userStorage.getAllById(friendshipStorage.findFriendsIdByUserId(userId));
+        }
+        return result;
     }
 
     @Override

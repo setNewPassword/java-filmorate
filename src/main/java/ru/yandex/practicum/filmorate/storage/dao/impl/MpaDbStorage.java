@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.dao.MpaStorage;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.model.FilmorateRowMapper.MPA_ROW_MAPPER;
@@ -29,7 +29,7 @@ public class MpaDbStorage implements MpaStorage{
     }
 
     @Override
-    public Collection<Mpa> getAll() {
+    public List<Mpa> getAll() {
         var sqlQuery = "SELECT * FROM mpa ORDER BY mpa_id";
         return jdbcTemplate.query(sqlQuery, MPA_ROW_MAPPER);
     }
