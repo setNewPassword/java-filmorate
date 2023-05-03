@@ -12,7 +12,7 @@ import java.util.List;
 
 import static ru.yandex.practicum.filmorate.model.FilmorateRowMapper.GENRE_ROW_MAPPER;
 
-@Repository("filmGenresDbStorage")
+@Repository("filmGenreDbStorage")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmGenreDbStorage implements FilmGenreStorage {
 

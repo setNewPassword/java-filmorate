@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 
 public class FilmorateRowMapper {
+
     public static final RowMapper<Film> FILM_ROW_MAPPER = (ResultSet resultSet, int rowNum) -> Film.builder()
             .id(resultSet.getLong("film_id"))
             .name(resultSet.getString("name"))
@@ -13,6 +14,15 @@ public class FilmorateRowMapper {
             .duration(resultSet.getInt("duration"))
             .mpa(new Mpa(resultSet.getInt("mpa_id")))
             .build();
+
+    public static final RowMapper<User> USER_ROW_MAPPER = (ResultSet resultSet, int rowNum) -> User.builder()
+            .id(resultSet.getLong("user_id"))
+            .login(resultSet.getString("login"))
+            .email(resultSet.getString("email"))
+            .name(resultSet.getString("name"))
+            .birthday(resultSet.getDate("birthday").toLocalDate())
+            .build();
+
     public static final RowMapper<Mpa> MPA_ROW_MAPPER = (ResultSet resultSet, int rowNum) ->
             new Mpa(resultSet.getInt("mpa_id"));
 

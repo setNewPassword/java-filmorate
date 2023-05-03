@@ -15,17 +15,17 @@ public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
 
     @Override
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         return new ArrayList<>(users.values());
     }
 
     @Override
-    public Optional<User> findById(Long id) {
+    public Optional<User> findById(long id) {
         return Optional.ofNullable(users.get(id));
     }
 
     @Override
-    public List<User> findAllById(Collection<Long> ids) {
+    public List<User> getAllById(Collection<Long> ids) {
         return ids.stream()
                 .map(users::get)
                 .filter(Objects::nonNull)

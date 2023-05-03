@@ -10,11 +10,11 @@ public interface UserStorage {
 
     User save(User user);
 
-    List<User> getAllUsers();
+    Optional<User> findById(long id);
 
-    Optional<User> findById(Long id);
+    List<User> getAll();
 
-    List<User> findAllById(Collection<Long> ids);
+    List<User> getAllById(Collection<Long> ids);
 
     void deleteById(long id);
 

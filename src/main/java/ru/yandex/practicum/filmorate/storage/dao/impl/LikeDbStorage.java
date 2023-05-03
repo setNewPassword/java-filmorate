@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Like;
 import ru.yandex.practicum.filmorate.storage.dao.LikeStorage;
 
-import java.util.Collection;
 import java.util.List;
 
 import static ru.yandex.practicum.filmorate.model.FilmorateRowMapper.LIKE_ROW_MAPPER;

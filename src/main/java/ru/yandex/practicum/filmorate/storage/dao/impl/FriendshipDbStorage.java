@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.exception.DatabaseResponseException;
 import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.storage.dao.FriendshipStorage;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 

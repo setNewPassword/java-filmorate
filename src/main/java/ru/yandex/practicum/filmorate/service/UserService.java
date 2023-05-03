@@ -11,13 +11,15 @@ public interface UserService {
 
     User update(User user);
 
-    User addFriend(Long basicUserId, Long addingUserId);
+    User addFriend(long basicUserId, long addingUserId);
 
-    User removeFriend(Long basicUserId, Long removingUserId);
+    User removeFriend(long basicUserId, long removingUserId);
 
-    List<User> getCommonFriends(Long basicUserId, Long secondUserId);
+    List<User> getCommonFriends(long basicUserId, long secondUserId);
 
-    User getUserById(Long userId);
+    User getUserById(long userId);
 
-    List<User> getUsersFriends(Long userId);
+    List<User> getUsersFriends(long userId);
+
+    boolean existsById(long id);
 }

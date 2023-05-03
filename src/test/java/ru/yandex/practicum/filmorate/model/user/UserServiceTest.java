@@ -17,7 +17,7 @@ import ru.yandex.practicum.filmorate.exception.IncorrectRequestException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import ru.yandex.practicum.filmorate.service.UserServiceImpl;
+import ru.yandex.practicum.filmorate.service.impl.UserServiceImpl;
 
 import java.time.LocalDate;
 import java.util.*;
