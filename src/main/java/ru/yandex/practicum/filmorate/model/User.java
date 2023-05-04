@@ -7,10 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import ru.yandex.practicum.filmorate.validate.NameValidator;
 
@@ -32,19 +29,35 @@ public class User {
     @PastOrPresent(message = "Некорректная дата рождения")
     private LocalDate birthday;
 
-    private final Map<Long, Boolean> friends;
+    private Set<Long> friends;
     @JsonCreator
     public User(@JsonProperty("id") Long id,
                 @JsonProperty("email") String email,
                 @JsonProperty("login") String login,
                 @JsonProperty("name") String name,
                 @JsonProperty("birthday") LocalDate birthday,
-                @JsonProperty("friends") Map<Long, Boolean> friends) {
+                @JsonProperty("friends") Set<Long> friends) {
         this.id = (id == null) ? 0 : id;
         this.email = email;
         this.login = login;
         this.name = NameValidator.validateName(name, login);
         this.birthday = birthday;
-        this.friends = (friends == null) ? new HashMap<>() : friends;
+        this.friends = (friends == null) ? new HashSet<>() : friends;
+    }
+
+    public void addFriendId(long id) {
+        friends.add(id);
+    }
+
+    public boolean deleteFriendId(long id) {
+        return friends.remove(id);
+    }
+
+    public List<Long> getFriends() {
+        return new ArrayList<>(friends);
+    }
+
+    public void clearFriendList() {
+        friends.clear();
     }
 }

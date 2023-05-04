@@ -50,11 +50,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        User updatedUser;
-        getUserFromRepositoryOrThrowException(user.getId());
-        updatedUser = userStorage.save(user);
-        log.info("Данные пользователя изменены: {}.", user);
-        return updatedUser;
+        if (userStorage.existsById(user.getId())) {
+            User updatedUser = userStorage.save(user);
+            log.info("Данные пользователя изменены: {}.", updatedUser);
+            return updatedUser;
+        } else {
+            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден.", user.getId()));
+        }
     }
 
     @Override
@@ -72,8 +74,10 @@ public class UserServiceImpl implements UserService {
                 throw new IncorrectRequestException(String
                         .format("Пользователи id: %d и id: %d уже являются друзьями.", basicUserId, addingUserId));
             }
+            return getUserFromRepositoryOrThrowException(addingUserId);
+        } else {
+            throw new UserNotFoundException("Пользователь с указанным ID не найден.");
         }
-        return getUserFromRepositoryOrThrowException(addingUserId);
     }
 
     @Override

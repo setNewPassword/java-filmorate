@@ -32,6 +32,30 @@ public class Film implements Comparable<Film> {
     @NotNull(message = "Не указан возрастной рейтинг фильма.")
     private Mpa mpa;
 
+    public void addLike(long id) {
+        likes.add(id);
+    }
+
+    public boolean removeLike(long id) {
+        return likes.remove(id);
+    }
+
+    public void clearLikes() {
+        likes.clear();
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
+
+    public boolean removeGenre(long id) {
+        return genres.remove(id);
+    }
+
+    public void clearGenres() {
+        genres.clear();
+    }
+
     @Override
     public int compareTo(Film o) {
         return Long.compare(this.id, o.id);
