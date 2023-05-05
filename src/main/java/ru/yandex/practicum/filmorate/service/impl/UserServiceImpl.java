@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.dao.FriendshipStorage;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) {
-        User createdUser = userStorage.save(user);
+        User verifiedUser = user.toBuilder().build();
+        User createdUser = userStorage.save(verifiedUser);
         log.info("Добавлен новый пользователь: {}.", createdUser);
         return createdUser;
     }
@@ -50,8 +52,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User update(User user) {
-        if (userStorage.existsById(user.getId())) {
-            User updatedUser = userStorage.save(user);
+        User verifiedUser = user.toBuilder().build();
+        if (userStorage.existsById(verifiedUser.getId())) {
+            User updatedUser = userStorage.save(verifiedUser);
             log.info("Данные пользователя изменены: {}.", updatedUser);
             return updatedUser;
         } else {
@@ -82,43 +85,39 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User removeFriend(long basicUserId, long removingUserId) {
-        if (existsById(basicUserId) && existsById(removingUserId)) {
-            Friendship friendship = new Friendship(basicUserId, removingUserId);
-            if (friendshipStorage.isExist(friendship)) {
-                friendshipStorage.cancelFriendship(friendship);
-                log.info("Пользователь с id = {} и пользователь с id = {} больше не являются друзьями.",
-                        basicUserId, removingUserId);
-            } else {
-                throw new IncorrectRequestException(String
-                        .format("Попытка расторгнуть несуществующую дружбу между пользователями с id = %d и id = %d.",
-                                basicUserId, removingUserId));
-            }
+        validateId(basicUserId);
+        validateId(removingUserId);
+        Friendship friendship = new Friendship(basicUserId, removingUserId);
+        if (friendshipStorage.isExist(friendship)) {
+            friendshipStorage.cancelFriendship(friendship);
+            log.info("Пользователь с id = {} и пользователь с id = {} больше не являются друзьями.",
+                    basicUserId, removingUserId);
+        } else {
+            throw new IncorrectRequestException(String
+                    .format("Попытка расторгнуть несуществующую дружбу между пользователями с id = %d и id = %d.",
+                            basicUserId, removingUserId));
         }
         return getUserFromRepositoryOrThrowException(basicUserId);
     }
 
     @Override
     public List<User> getCommonFriends(long basicUserId, long secondUserId) {
-        List<Long> commonFriendsId = null;
         log.info("Запрошен список общих друзей пользователя с id = {} и пользователя с id = {}.", basicUserId, secondUserId);
-        if (existsById(basicUserId) && existsById(secondUserId)) {
-            Collection<Long> basicUserFriendsId = friendshipStorage.findFriendsIdByUserId(basicUserId);
-            commonFriendsId = friendshipStorage.findFriendsIdByUserId(secondUserId)
-                    .stream()
-                    .filter(basicUserFriendsId::contains)
-                    .collect(Collectors.toList());
-        }
+        validateId(basicUserId);
+        validateId(secondUserId);
+        Collection<Long> basicUserFriendsId = friendshipStorage.findFriendsIdByUserId(basicUserId);
+        List<Long> commonFriendsId = friendshipStorage.findFriendsIdByUserId(secondUserId)
+                .stream()
+                .filter(basicUserFriendsId::contains)
+                .collect(Collectors.toList());
         return userStorage.getAllById(commonFriendsId);
     }
 
     @Override
     public List<User> getUsersFriends(long userId) {
-        List<User> result = null;
         log.info("Запрошен список друзей пользователя с id = {}.", userId);
-        if (existsById(userId)) {
-            result = userStorage.getAllById(friendshipStorage.findFriendsIdByUserId(userId));
-        }
-        return result;
+        validateId(userId);
+        return userStorage.getAllById(friendshipStorage.findFriendsIdByUserId(userId));
     }
 
     @Override
@@ -129,6 +128,12 @@ public class UserServiceImpl implements UserService {
     private User getUserFromRepositoryOrThrowException(long id) {
         return userStorage
                 .findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id " + id + " не найден."));
+                .orElseThrow(() -> new UserNotFoundException(String.format("Пользователь с id = %d не найден.", id)));
+    }
+
+    private void validateId(long id) {
+        if (!userStorage.existsById(id)) {
+            throw new UserNotFoundException(String.format("Пользователь с id = %d не найден.", id));
+        }
     }
 }
