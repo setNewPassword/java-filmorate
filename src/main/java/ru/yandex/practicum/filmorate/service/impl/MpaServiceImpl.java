@@ -20,6 +20,7 @@ public class MpaServiceImpl implements MpaService {
     public MpaServiceImpl(MpaStorage mpaStorage) {
         this.storage = mpaStorage;
     }
+
     @Override
     public List<Mpa> getAll() {
         log.info("Запрошен полный список рейтингов MPA.");

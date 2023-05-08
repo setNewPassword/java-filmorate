@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.DatabaseResponseException;
@@ -86,7 +86,7 @@ public class FriendshipDbStorage implements FriendshipStorage {
                 "OR user_id = :friendId AND friend_id = :userId";
         var friendParams = new BeanPropertySqlParameterSource(friendship);
         SqlRowSet rs = namedParameterJdbcTemplate.queryForRowSet(sqlQuery, friendParams);
-        boolean isConfirmed = false;
+        boolean isConfirmed;
         if (rs.next()) {
             isConfirmed = rs.getBoolean("confirmed");
         } else {

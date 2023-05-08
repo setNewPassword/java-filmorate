@@ -15,9 +15,10 @@ import static ru.yandex.practicum.filmorate.model.FilmorateRowMapper.MPA_ROW_MAP
 
 @Repository("mpaDbStorage")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class MpaDbStorage implements MpaStorage{
+public class MpaDbStorage implements MpaStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public Optional<Mpa> findById(long id) {
         String sqlQuery = "SELECT * FROM mpa WHERE mpa_id = ?";

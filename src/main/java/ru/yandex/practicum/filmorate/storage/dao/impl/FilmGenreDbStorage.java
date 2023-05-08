@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.dao.impl;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -33,7 +32,7 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
         SqlParameterSource[] batch = film.getGenres()
                 .stream()
                 .map(Genre::getId)
-                .map(genreId -> new  MapSqlParameterSource()
+                .map(genreId -> new MapSqlParameterSource()
                         .addValue("film_id", film.getId())
                         .addValue("genre_id", genreId))
                 .toArray(SqlParameterSource[]::new);

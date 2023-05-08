@@ -18,6 +18,7 @@ import static ru.yandex.practicum.filmorate.model.FilmorateRowMapper.GENRE_ROW_M
 public class GenreDbStorage implements GenreStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public Optional<Genre> findById(long id) {
         var sqlQuery = "SELECT * FROM genre WHERE genre_id = ?";

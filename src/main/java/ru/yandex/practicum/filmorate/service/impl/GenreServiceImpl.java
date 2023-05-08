@@ -20,6 +20,7 @@ public class GenreServiceImpl implements GenreService {
     public GenreServiceImpl(GenreStorage storage) {
         this.storage = storage;
     }
+
     @Override
     public List<Genre> getAll() {
         log.info("Запрошен полный список жанров.");

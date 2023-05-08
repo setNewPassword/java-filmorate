@@ -2,14 +2,17 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.validate.NameValidator;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.*;
-
-import ru.yandex.practicum.filmorate.validate.NameValidator;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Slf4j
@@ -30,6 +33,7 @@ public class User {
     private LocalDate birthday;
 
     private Set<Long> friends;
+
     @JsonCreator
     public User(@JsonProperty("id") Long id,
                 @JsonProperty("email") String email,

@@ -1,42 +1,36 @@
 package ru.yandex.practicum.filmorate.unit.film;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.hamcrest.Matchers.*;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(FilmController.class)
 
@@ -253,7 +247,7 @@ public class FilmControllerTest {
                 .andExpect(result -> assertTrue(result
                         .getResolvedException() instanceof MethodArgumentNotValidException))
                 .andExpect(result -> assertTrue(Objects.requireNonNull(result
-                        .getResolvedException())
+                                .getResolvedException())
                         .getMessage()
                         .contains("Field error in object 'film' on field 'name'")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -275,7 +269,7 @@ public class FilmControllerTest {
                 .andExpect(result -> assertTrue(result
                         .getResolvedException() instanceof MethodArgumentNotValidException))
                 .andExpect(result -> assertTrue(Objects.requireNonNull(result
-                        .getResolvedException())
+                                .getResolvedException())
                         .getMessage()
                         .contains("Field error in object 'film' on field 'releaseDate'")))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))

@@ -28,6 +28,7 @@ public class UserDbStorage implements UserStorage {
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     }
+
     @Override
     public User save(User user) {
         String sqlQuery;
@@ -81,7 +82,7 @@ public class UserDbStorage implements UserStorage {
     public void deleteAllById(Collection<Long> ids) {
         var sqlQuery = "DELETE FROM users WHERE user_id IN (:ids)";
         var idsParams = new MapSqlParameterSource("ids", ids);
-        namedParameterJdbcTemplate.update(sqlQuery,idsParams);
+        namedParameterJdbcTemplate.update(sqlQuery, idsParams);
     }
 
     @Override

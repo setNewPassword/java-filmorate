@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.integration.film;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -13,8 +12,10 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.dao.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.dao.impl.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.dao.impl.UserDbStorage;
+
 import java.time.LocalDate;
 import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -37,7 +38,6 @@ class LikeDaoTest {
         userStorage.save(user);
     }
 
-    @BeforeEach
     public void createEnvironment() {
         film = Film.builder()
                 .id(0)
@@ -56,12 +56,12 @@ class LikeDaoTest {
                 .build();
     }
 
-/*    @AfterEach
+    @AfterEach
     void afterEach() {
         likeStorage.deleteAllLikes();
         filmStorage.clear();
         userStorage.deleteAll();
-    }*/
+    }
 
     @Test
     void testSaveAndFind() {

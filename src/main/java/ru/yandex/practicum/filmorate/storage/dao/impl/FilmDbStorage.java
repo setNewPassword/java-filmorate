@@ -4,11 +4,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.DatabaseResponseException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -26,6 +23,7 @@ public class FilmDbStorage implements FilmStorage {
         this.jdbcTemplate = jdbcTemplate;
         namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     }
+
     @Override
     public Film create(Film film) {
         return null;
@@ -117,7 +115,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public boolean deleteFilmById(Long id) {
         String sqlQuery = "DELETE FROM films WHERE film_id = ?";
-            int rows = jdbcTemplate.update(sqlQuery);
+        int rows = jdbcTemplate.update(sqlQuery);
         return rows != 0;
     }
 

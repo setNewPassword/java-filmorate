@@ -24,6 +24,7 @@ public class LikeDbStorage implements LikeStorage {
         this.jdbcTemplate = jdbcTemplate;
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     }
+
     @Override
     public Like saveLike(Like like) {
         var sqlQuery = "INSERT INTO likes (film_id, user_id) VALUES (:filmId, :userId)";
@@ -52,8 +53,7 @@ public class LikeDbStorage implements LikeStorage {
     @Override
     public List<Long> findUsersIdByFilmId(long id) {
         var sqlQuery = "SELECT user_id FROM likes WHERE film_id = ?";
-        List<Long> ids = jdbcTemplate.queryForList(sqlQuery, Long.class, id);
-        return ids;
+        return jdbcTemplate.queryForList(sqlQuery, Long.class, id);
     }
 
     @Override
