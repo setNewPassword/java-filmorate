@@ -281,7 +281,7 @@ public class UserControllerTest {
     }
 
     @Test
-    void shouldThrowHttpRequestMethodNotSupportedExceptionWhenMethodNotAllowed_() throws Exception {
+    void shouldThrowHttpRequestMethodNotSupportedExceptionWhenMethodNotAllowed() throws Exception {
         mvc.perform(patch("/users").contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(user1)))
                 .andExpect(status().isMethodNotAllowed())

@@ -33,7 +33,7 @@ public class FilmGenreDbStorage implements FilmGenreStorage {
         SqlParameterSource[] batch = film.getGenres()
                 .stream()
                 .map(Genre::getId)
-                .map(genreId -> new MapSqlParameterSource()
+                .map(genreId -> new  MapSqlParameterSource()
                         .addValue("film_id", film.getId())
                         .addValue("genre_id", genreId))
                 .toArray(SqlParameterSource[]::new);

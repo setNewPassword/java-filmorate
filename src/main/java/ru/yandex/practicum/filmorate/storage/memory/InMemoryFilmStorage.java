@@ -47,6 +47,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public void clear() {
+        films.clear();
+    }
+
+    @Override
     public Film create(Film film) {
         film.setId(++idCounter);
         films.put(film.getId(), film);
