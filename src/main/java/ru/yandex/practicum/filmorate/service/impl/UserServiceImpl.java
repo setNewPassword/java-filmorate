@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.IncorrectRequestException;
@@ -18,16 +18,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
     private final FriendshipStorage friendshipStorage;
-
-    @Autowired
-    public UserServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage, FriendshipStorage friendshipStorage) {
-        this.userStorage = userStorage;
-        this.friendshipStorage = friendshipStorage;
-    }
 
     @Override
     public List<User> getAllUsers() {

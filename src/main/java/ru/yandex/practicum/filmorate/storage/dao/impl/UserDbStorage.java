@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.dao.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -18,16 +19,12 @@ import java.util.Optional;
 
 import static ru.yandex.practicum.filmorate.model.FilmorateRowMapper.USER_ROW_MAPPER;
 
+@RequiredArgsConstructor
 @Repository("userDbStorage")
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-    }
 
     @Override
     public User save(User user) {
@@ -93,8 +90,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean existsById(long id) {
-        var sqlQuery = "SELECT user_id FROM users WHERE user_id = ?";
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sqlQuery, id);
-        return rowSet.next();
+        return findById(id).isPresent();
     }
 }

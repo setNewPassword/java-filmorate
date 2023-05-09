@@ -12,7 +12,7 @@ public class FilmorateRowMapper {
             .description(resultSet.getString("description"))
             .releaseDate(resultSet.getDate("release_date").toLocalDate())
             .duration(resultSet.getInt("duration"))
-            .mpa(new Mpa(resultSet.getInt("mpa_id")))
+            .mpa(new Mpa(resultSet.getInt("mpa_id"), resultSet.getString("mpa_name")))
             .build();
 
     public static final RowMapper<User> USER_ROW_MAPPER = (ResultSet resultSet, int rowNum) -> User.builder()

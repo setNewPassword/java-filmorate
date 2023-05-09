@@ -6,7 +6,7 @@ VALUES ('Comedy'),
        ('Documentary'),
        ('Action');
 
-INSERT INTO mpa (name, description)
+INSERT INTO mpa (mpa_name, description)
 values ('G', 'У фильма нет возрастных ограничений'),
        ('PG', 'Детям рекомендуется смотреть фильм с родителями'),
        ('PG-13', 'Детям до 13 лет просмотр не желателен'),

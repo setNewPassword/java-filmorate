@@ -77,16 +77,6 @@ public class FilmServiceImpl implements FilmService {
         }
         log.info("Добавлен новый фильм: {}.", film);
         return film;
-        /*Film createdFilm = film.toBuilder().build();
-        if (createdFilm.getId() != 0) {
-            throw new ValidationException("Недопустимый ID для создания фильма");
-        }
-        createdFilm = filmStorage.save(createdFilm);
-        if (!createdFilm.getGenres().isEmpty()) {
-            createdFilm = filmGenreStorage.save(createdFilm);
-        }
-        log.info("Добавлен новый фильм: {}.", createdFilm);
-        return createdFilm;*/
     }
 
     @Override
