@@ -1,6 +1,6 @@
 # ER-диаграмма filmorate
 
-<img src = "src/main/resources/static/QuickDBD-Filmorate.svg" width="900" height = "650">
+<img src = "src/main/resources/static/QuickDBD-Filmorate.svg" width="900" height = "650" alt="ER-diagram">
 
 [Посмотреть в редакторе](https://app.quickdatabasediagrams.com/#/d/SLGmVl)
 
@@ -28,15 +28,15 @@
 * description — описание фильма
 * release_date — дата выхода
 * duration — длительность фильма в минутах
-* rating_id — идентификатор рейтинга MPAA
+* mpa_id — идентификатор рейтинга MPAA
 
 
-#### rating
+#### mpa
 Содержит информацию о возрастном рейтинге MPAA
 
 **Поля:**
 
-* rating_id — идентификатор рейтинга, Primary Key
+* mpa_id — идентификатор рейтинга, Primary Key
 * name — название рейтинга
 * description — описание, например:
   - G — без возрастных ограничений
@@ -48,7 +48,7 @@
 
 **Поля:**
 
-* genre_id — идентификатор жанра, с Key
+* genre_id — идентификатор жанра, Primary Key
 * name — название жанра, например:
   - Комедия
   - Драма
@@ -60,7 +60,7 @@
 **Поля:**
 
 * film_id (отсылает к таблице films) — идентификатор фильма, Foreign Key
-* category_id (отсылает к таблице genre) — идентификатор жанра, Foreign Key
+* genre_id (отсылает к таблице genre) — идентификатор жанра, Foreign Key
 
 
 #### likes
@@ -72,30 +72,15 @@
 * user_id (отсылает к таблице users) — id пользователя, поставившего лайк, Foreign Key
 
 
-#### friendship_status
-Содержит информацию о возможных статусах дружбы из таблицы friendship
-
-**Поля:**
-
-* status_id (отсылает к таблице friendship) — идентификатор статуса, Primary Key
-* name — наименование статуса, например:
-  - OUTGOING
-  - INCOMING
-  - CONFIRMED
-* description — описание статуса, например:
-  - Отправлен запрос на дружбу
-  - Получен запрос на дружбу
-  - Дружба подтверждена
-
 
 #### friendship
-Содержит информацию о дружбе: id1 — id2 — status_id
+Содержит информацию о дружбе: id1 — id2 — confirmed
 
 **Поля:**
 
 * user_id (отсылает к таблице users) — идентификатор пользователя-1, Foreign Key
 * friend_id (отсылает к таблице users) — идентификатор пользователя-2, Foreign Key
-* status_id — идентификатор статуса дружбы
+* confirmed — статус дружбы (подтверждена или нет)
 
 
 
@@ -156,14 +141,10 @@ FROM users
 WHERE user_id IN
     (SELECT friend_id
      FROM friendship
-     WHERE (user_id = 1 AND status_id IN (SELECT status_id
-          FROM friendship_status
-          WHERE name = 'CONFIRMED'))
+     WHERE (user_id = 1 AND confirmed = '1')
      UNION SELECT user_id
      FROM friendship
-     WHERE (friend_id = 1 AND status_id IN (SELECT status_id
-          FROM friendship_status
-          WHERE name = 'CONFIRMED')));
+     WHERE (friend_id = 1 AND confirmed = '1'));
 ```
 
 #### Запрос общих друзей пользователей id = 1 и id = 2
@@ -175,16 +156,12 @@ WHERE user_id IN
     (SELECT friend_id
      FROM friendship
      WHERE user_id = 1
-       AND status_id IN (SELECT status_id
-          FROM friendship_status
-          WHERE name = 'CONFIRMED')
+       AND confirmed = '1'
        AND friend_id NOT IN (1, 2)
      UNION SELECT user_id
      FROM friendship
      WHERE friend_id = 1
-       AND status_id IN (SELECT status_id
-          FROM friendship_status
-          WHERE name = 'CONFIRMED')
+       AND confirmed = '1'
        AND user_id NOT IN (1, 2))
 INTERSECT SELECT DISTINCT *
 FROM users
@@ -192,15 +169,11 @@ WHERE user_id IN
     (SELECT friend_id
      FROM friendship
      WHERE user_id = 2
-       AND status_id IN (SELECT status_id
-          FROM friendship_status
-          WHERE name = 'CONFIRMED')
+       AND confirmed = '1'
        AND friend_id NOT IN (1, 2)
      UNION SELECT user_id
      FROM friendship
      WHERE friend_id = 2
-       AND status_id IN (SELECT status_id
-          FROM friendship_status
-          WHERE name = 'CONFIRMED')
+       AND confirmed = '1'
        AND user_id NOT IN (1, 2));
 ```

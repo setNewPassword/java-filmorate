@@ -2,15 +2,17 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.validate.NameValidator;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
-import ru.yandex.practicum.filmorate.validate.NameValidator;
 
 @Data
 @Slf4j
@@ -45,5 +47,21 @@ public class User {
         this.name = NameValidator.validateName(name, login);
         this.birthday = birthday;
         this.friends = (friends == null) ? new HashSet<>() : friends;
+    }
+
+    public void addFriendId(long id) {
+        friends.add(id);
+    }
+
+    public boolean deleteFriendId(long id) {
+        return friends.remove(id);
+    }
+
+    public List<Long> getFriends() {
+        return new ArrayList<>(friends);
+    }
+
+    public void clearFriendList() {
+        friends.clear();
     }
 }

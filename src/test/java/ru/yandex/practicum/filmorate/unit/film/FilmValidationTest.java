@@ -1,24 +1,24 @@
-package ru.yandex.practicum.filmorate.model.film;
-
-import ru.yandex.practicum.filmorate.model.Film;
+package ru.yandex.practicum.filmorate.unit.film;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FilmValidationTest {
     static Validator validator;
     Film film;
+    static Random random = new Random();
 
     @BeforeAll
     public static void getValidator() {
@@ -33,6 +33,7 @@ public class FilmValidationTest {
                 .description("American epic romance and disaster film directed by James Cameron.")
                 .releaseDate(LocalDate.of(1997, 12, 19))
                 .duration(195)
+                .mpa(new Mpa(1))
                 .build();
     }
 
@@ -92,4 +93,55 @@ public class FilmValidationTest {
 
         assertFalse(violations.isEmpty(), "Продолжительность фильма не положительная.");
     }
+
+    @Test
+    void shouldAddUserIdInLikes() {
+        final long userId = random.nextInt(97);
+        film.addLike(userId);
+        final Set<Long> result = film.getLikes();
+
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals(Set.of(userId), result);
+        assertTrue(result.contains(userId));
+    }
+
+    @Test
+    void shouldRemoveUserIdFromLikes() {
+        final long userId = random.nextInt(32) + 1;
+        film.addLike(userId);
+        film.removeLike(userId);
+        final Set<Long> result = film.getLikes();
+
+        assertTrue(result.isEmpty());
+        assertEquals(Collections.emptySet(), result);
+        assertFalse(result.contains(userId));
+    }
+
+    @Test
+    void shouldReturnLikes() {
+        final Set<Long> expectedList = new HashSet<>();
+        for (long i = 1; i <= 10; i++) {
+            film.addLike(i);
+            expectedList.add(i);
+        }
+        final Set<Long> returned = film.getLikes();
+
+
+        assertFalse(returned.isEmpty());
+        assertEquals(expectedList.size(), returned.size());
+        assertEquals(expectedList, returned);
+        assertTrue(returned.containsAll(expectedList));
+    }
+
+    @Test
+    void shouldClearLikes() {
+        final long userId = random.nextInt(97);
+        film.addLike(userId);
+        film.clearLikes();
+        final Set<Long> clearList = film.getLikes();
+
+        assertTrue(clearList.isEmpty());
+    }
+
 }

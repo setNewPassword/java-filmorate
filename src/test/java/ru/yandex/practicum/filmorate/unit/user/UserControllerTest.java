@@ -1,28 +1,35 @@
-package ru.yandex.practicum.filmorate.model.user;
+package ru.yandex.practicum.filmorate.unit.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.mockito.ArgumentMatchers.any;
-
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
-import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserController.class)
 
@@ -209,5 +216,81 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$[0].login", is(commonFriend.getLogin())))
                 .andExpect(jsonPath("$[0].name", is(commonFriend.getName())))
                 .andExpect(jsonPath("$[0].birthday", is(commonFriend.getBirthday().toString())));
+    }
+
+    @Test
+    void shouldThrowHttpMessageNotReadableExceptionWhenBadJson() throws Exception {
+        lenient().when(service.create(any(User.class))).thenReturn(user1);
+
+        var mvcRequest = post("/users").contentType(MediaType.APPLICATION_JSON)
+                .content("\"id\": 000");
+
+        mvc.perform(mvcRequest).andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof HttpMessageNotReadableException))
+                .andExpect(result -> assertTrue(Objects.requireNonNull(result.getResolvedException())
+                        .getMessage()
+                        .startsWith("JSON parse error")))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", is("Получен некорректный JSON")))
+                .andExpect(jsonPath("$.description", Matchers.startsWith("JSON parse error")));
+
+        verify(service, never()).create(any(User.class));
+    }
+
+    @Test
+    void shouldThrowMethodArgumentTypeMismatchExceptionWhenBadPathVariable() throws Exception {
+        lenient().when(service.update(any(User.class))).thenReturn(user1);
+
+        var mvcRequest = get(String.format("/users/%s", user1.getEmail()));
+
+        mvc.perform(mvcRequest).andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof MethodArgumentTypeMismatchException))
+                .andExpect(result -> assertTrue(Objects.requireNonNull(result.getResolvedException()).getMessage()
+                        .contains("Failed to convert value of type")))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", containsString(String.format(
+                        "Параметр 'userId' со значением '%s' не может быть приведен к типу 'long'", user1.getEmail()))))
+                .andExpect(jsonPath("$.description", containsString("Failed to convert value " +
+                        "of type 'java.lang.String' to required type 'long'")));
+
+        verify(service, never()).update(any(User.class));
+    }
+
+    @Test
+    void shouldThrowMethodArgumentNotValidExceptionWhenObjectHasBadField() throws Exception {
+        lenient().when(service.create(any(User.class))).thenReturn(user1);
+
+        user1.setLogin("Дмитрий Евтюхин");
+        var mvcRequest = post("/users").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(user1));
+
+        mvc.perform(mvcRequest).andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof MethodArgumentNotValidException))
+                .andExpect(result -> assertTrue(Objects.requireNonNull(result.getResolvedException()).getMessage()
+                        .contains("Field error in object 'user' on field 'login'")))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", containsString("login")))
+                .andExpect(jsonPath("$.description",
+                        containsString("Логин содержит пробелы")));
+
+        verify(service, never()).create(any(User.class));
+    }
+
+    @Test
+    void shouldThrowHttpRequestMethodNotSupportedExceptionWhenMethodNotAllowed() throws Exception {
+        mvc.perform(patch("/users").contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(user1)))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(result -> assertTrue(result.getResolvedException()
+                        instanceof HttpRequestMethodNotSupportedException))
+                .andExpect(result -> assertTrue(Objects.requireNonNull(result.getResolvedException()).getMessage()
+                        .matches("^Request method '(POST|PUT|PATCH|DELETE)' not supported$")))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", matchesPattern(
+                        "^Request method '(POST|PUT|PATCH|DELETE)' not supported$")))
+                .andExpect(jsonPath("$.description", matchesPattern("^(POST|PUT|PATCH|DELETE)$")));
     }
 }
