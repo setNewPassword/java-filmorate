@@ -137,9 +137,7 @@ public class UserServiceTest {
 
     @Test
     void shouldAddFriend() {
-        given(userStorage.existsById(user1.getId())).willReturn(Boolean.TRUE);
-        given(userStorage.existsById(user2.getId())).willReturn(Boolean.TRUE);
-        given(friendshipStorage.isExist(any(Friendship.class))).willReturn(Boolean.TRUE);
+        setupUserStorageExistsByIdAndIsExistStubs(Boolean.TRUE);
         given(userStorage.findById(user2.getId())).willReturn(Optional.of(user2));
 
         final User returnedUser = userService.addFriend(user1.getId(), user2.getId());
@@ -170,8 +168,7 @@ public class UserServiceTest {
 
     @Test
     void shouldTrowUserNotFoundExceptionWhenUser2NotExist() {
-        given(userStorage.existsById(user1.getId())).willReturn(Boolean.TRUE);
-        given(userStorage.existsById(user2.getId())).willReturn(Boolean.FALSE);
+        setupUserStorageExistsByIdStubs(Boolean.FALSE);
 
         final Throwable exception = assertThrows(UserNotFoundException.class, () ->
                 usersArray[0] = userService.addFriend(user1.getId(), user2.getId()));
@@ -187,9 +184,7 @@ public class UserServiceTest {
 
     @Test
     void shouldRemoveFriend() {
-        given(userStorage.existsById(user1.getId())).willReturn(Boolean.TRUE);
-        given(userStorage.existsById(user2.getId())).willReturn(Boolean.TRUE);
-        given(friendshipStorage.isExist(any(Friendship.class))).willReturn(Boolean.TRUE);
+        setupUserStorageExistsByIdAndIsExistStubs(Boolean.TRUE);
         given(userStorage.findById(anyLong())).willReturn(Optional.of(user2));
 
         final User returned = userService.removeFriend(user1.getId(), user2.getId());
@@ -205,9 +200,7 @@ public class UserServiceTest {
 
     @Test
     void shouldThrowIncorrectRequestExceptionWhenRemoveFriendWithoutFriendship() {
-        given(userStorage.existsById(user1.getId())).willReturn(Boolean.TRUE);
-        given(userStorage.existsById(user2.getId())).willReturn(Boolean.TRUE);
-        given(friendshipStorage.isExist(any(Friendship.class))).willReturn(Boolean.FALSE);
+        setupUserStorageExistsByIdAndIsExistStubs(Boolean.FALSE);
 
         final Throwable exception = assertThrows(IncorrectRequestException.class, () ->
                 usersArray[0] = userService.removeFriend(user1.getId(), user2.getId()));
@@ -240,8 +233,7 @@ public class UserServiceTest {
 
     @Test
     void shouldThrowUserNotFoundExceptionWhenRemoveUser2NotExist() {
-        given(userStorage.existsById(user1.getId())).willReturn(Boolean.TRUE);
-        given(userStorage.existsById(user2.getId())).willReturn(Boolean.FALSE);
+        setupUserStorageExistsByIdStubs(Boolean.FALSE);
 
         final Throwable exception = assertThrows(UserNotFoundException.class, () ->
                 usersArray[0] = userService.removeFriend(user1.getId(), user2.getId()));
@@ -296,8 +288,7 @@ public class UserServiceTest {
                 .login("googolplex")
                 .birthday(LocalDate.of(1973, 8, 21))
                 .build();
-        given(userStorage.existsById(user1.getId())).willReturn(Boolean.TRUE);
-        given(userStorage.existsById(user2.getId())).willReturn(Boolean.TRUE);
+        setupUserStorageExistsByIdStubs(Boolean.TRUE);
         given(friendshipStorage.findFriendsIdByUserId(user1.getId())).willReturn(List.of(commonFriend.getId()));
         given(friendshipStorage.findFriendsIdByUserId(user2.getId())).willReturn(List.of(commonFriend.getId()));
         given(userStorage.getAllById(anyCollection())).willReturn(List.of(commonFriend));
@@ -331,8 +322,7 @@ public class UserServiceTest {
 
     @Test
     void shouldThrowUserNotFoundExceptionWhenUser2NotExistAndGetCommonFriends() {
-        given(userStorage.existsById(user1.getId())).willReturn(Boolean.TRUE);
-        given(userStorage.existsById(user2.getId())).willReturn(Boolean.FALSE);
+        setupUserStorageExistsByIdStubs(Boolean.FALSE);
 
         final List<User> users = new ArrayList<>();
         final Throwable exception = assertThrows(UserNotFoundException.class, () ->
@@ -344,5 +334,15 @@ public class UserServiceTest {
         assertThat(exception).isNotNull();
         assertThat(exception.getClass()).isEqualTo(UserNotFoundException.class);
         assertThat(exception.getMessage()).isEqualTo(String.format("Пользователь с id = %d не найден.", user2.getId()));
+    }
+
+    private void setupUserStorageExistsByIdStubs(Boolean existsByIdReturnValue) {
+        given(userStorage.existsById(user1.getId())).willReturn(Boolean.TRUE);
+        given(userStorage.existsById(user2.getId())).willReturn(existsByIdReturnValue);
+    }
+
+    private void setupUserStorageExistsByIdAndIsExistStubs(boolean isExistReturnValue) {
+        setupUserStorageExistsByIdStubs(Boolean.TRUE);
+        given(friendshipStorage.isExist(any(Friendship.class))).willReturn(isExistReturnValue);
     }
 }
