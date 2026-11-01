@@ -160,9 +160,7 @@ public class FilmServiceTest {
     @Test
     void shouldReturnFilmObjectWhenAddLike() {
         film1.setId(1);
-        given(filmStorage.findById(anyLong())).willReturn(Optional.of(film1));
-        given(userService.getUserById(anyLong())).willReturn(user);
-        given(likeStorage.isExist(any(Like.class))).willReturn(Boolean.FALSE);
+        setupFilmStorageFindByIdAndGetUserByIdAndIsExistStubs(Boolean.FALSE);
 
         final Film returned = filmService.addLike(film1.getId(), user.getId());
 
@@ -175,8 +173,7 @@ public class FilmServiceTest {
 
     @Test
     void shouldThrowFilmNotFoundExceptionWhenFilmIdNotPresentInStorageAndAddLike() {
-        given(filmStorage.findById(anyLong())).willReturn(Optional.empty());
-        lenient().when(userService.getUserById(anyLong())).thenReturn(user);
+        setupFilmStorageFindByIdAndGetUserByIdStubs();
 
         final Throwable exception = assertThrows(FilmNotFoundException.class, () ->
                 filmsArray[0] = filmService.addLike(film1.getId(), user.getId()));
@@ -191,8 +188,7 @@ public class FilmServiceTest {
 
     @Test
     void shouldThrowUserNotFoundExceptionWhenAddLikeAndUserIdNotPresent() {
-        given(filmStorage.findById(anyLong())).willReturn(Optional.of(film1));
-        given(userService.getUserById(anyLong())).willThrow(new UserNotFoundException("Пользователь не найден."));
+        setupFilmStorageFindByIdAndGetUserByIdStubs2();
 
         final Throwable exception = assertThrows(UserNotFoundException.class, () ->
                 filmsArray[0] = filmService.addLike(film1.getId(), user.getId()));
@@ -209,9 +205,7 @@ public class FilmServiceTest {
     void shouldReturnFilmObjectWhenRemoveLike() {
         film1.setId(1);
         user.setId(1);
-        given(filmStorage.findById(anyLong())).willReturn(Optional.of(film1));
-        given(userService.getUserById(anyLong())).willReturn(user);
-        given(likeStorage.isExist(any(Like.class))).willReturn(Boolean.TRUE);
+        setupFilmStorageFindByIdAndGetUserByIdAndIsExistStubs(Boolean.TRUE);
 
         final Film returned = filmService.removeLike(film1.getId(), user.getId());
 
@@ -224,9 +218,7 @@ public class FilmServiceTest {
 
     @Test
     void shouldThrowIncorrectRequestExceptionWhenUserDontLikeFilmAndRemoveLike() {
-        given(filmStorage.findById(anyLong())).willReturn(Optional.of(film1));
-        given(userService.getUserById(anyLong())).willReturn(user);
-        given(likeStorage.isExist(any(Like.class))).willReturn(Boolean.FALSE);
+        setupFilmStorageFindByIdAndGetUserByIdAndIsExistStubs(Boolean.FALSE);
 
         final Throwable exception = assertThrows(IncorrectRequestException.class, () ->
                 filmsArray[0] = filmService.removeLike(film1.getId(), user.getId()));
@@ -243,8 +235,7 @@ public class FilmServiceTest {
 
     @Test
     void shouldThrowFilmNotFoundExceptionWhenFilmIdNotPresentInStorageAndRemoveLike() {
-        given(filmStorage.findById(anyLong())).willReturn(Optional.empty());
-        lenient().when(userService.getUserById(anyLong())).thenReturn(user);
+        setupFilmStorageFindByIdAndGetUserByIdStubs();
 
         final Throwable exception = assertThrows(FilmNotFoundException.class, () ->
                 filmsArray[0] = filmService.removeLike(film1.getId(), user.getId()));
@@ -259,8 +250,7 @@ public class FilmServiceTest {
 
     @Test
     void shouldThrowUserNotFoundExceptionWhenUserIdNotExistAndRemoveLike() {
-        given(filmStorage.findById(anyLong())).willReturn(Optional.of(film1));
-        given(userService.getUserById(anyLong())).willThrow(new UserNotFoundException("Пользователь не найден."));
+        setupFilmStorageFindByIdAndGetUserByIdStubs2();
 
         final Throwable exception = assertThrows(UserNotFoundException.class, () ->
                 filmsArray[0] = filmService.removeLike(film1.getId(), user.getId()));
@@ -299,5 +289,21 @@ public class FilmServiceTest {
         assertThat(topLikedFilms).isNotNull();
         assertThat(topLikedFilms.size()).isEqualTo(1);
         assertThat(topLikedFilms).isEqualTo(List.of(film2));
+    }
+
+    private void setupFilmStorageFindByIdAndGetUserByIdAndIsExistStubs(boolean isExistReturnValue) {
+        given(filmStorage.findById(anyLong())).willReturn(Optional.of(film1));
+        given(userService.getUserById(anyLong())).willReturn(user);
+        given(likeStorage.isExist(any(Like.class))).willReturn(isExistReturnValue);
+    }
+
+    private void setupFilmStorageFindByIdAndGetUserByIdStubs() {
+        given(filmStorage.findById(anyLong())).willReturn(Optional.empty());
+        lenient().when(userService.getUserById(anyLong())).thenReturn(user);
+    }
+
+    private void setupFilmStorageFindByIdAndGetUserByIdStubs2() {
+        given(filmStorage.findById(anyLong())).willReturn(Optional.of(film1));
+        given(userService.getUserById(anyLong())).willThrow(new UserNotFoundException("Пользователь не найден."));
     }
 }
